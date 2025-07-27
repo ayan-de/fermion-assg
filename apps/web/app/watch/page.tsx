@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Header } from "../../components/Header";
-import { VideoPlayer } from "../../components/VideoPlayer";
+import { VideoPlayer } from "../../components/VideoStream";
 
 export default function WatchPage() {
   const [stream, setStream] = useState<MediaStream | null>(null);

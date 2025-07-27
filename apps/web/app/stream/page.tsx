@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Header } from "../../components/Header";
-import { VideoPlayer } from "../../components/VideoPlayer";
+import { VideoPlayer } from "../../components/VideoStream";
 
 export default function StreamPage() {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
