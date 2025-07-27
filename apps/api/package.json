@@ -19,7 +19,10 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
     "mediasoup": "^3.16.8",
+    "nodemon": "^3.1.10",
     "socket.io": "^4.8.1"
   }
 }
