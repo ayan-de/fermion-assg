@@ -1,43 +1,89 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Header } from "../../components/Header";
-import { VideoPlayer } from "../../components/VideoStream";
+import React, { useState } from "react";
+import { useSocket, useWebRTC } from "../../hooks";
+import { VideoStream } from "../../components";
 
-export default function StreamPage() {
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+const StreamPage: React.FC = () => {
+  const [roomId] = useState("room-1"); // Default room for demo
+  const { socket, isConnected } = useSocket("http://localhost:3001");
+  const { localStream, isStreaming, startStreaming, stopStreaming } = useWebRTC(
+    {
+      socket,
+      roomId,
+    }
+  );
 
-  useEffect(() => {
-    // In a real application, you would use a WebRTC library to handle streaming.
-    // For this example, we'll use placeholders.
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then(setLocalStream);
-
-    // Simulate receiving a remote stream
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then(setRemoteStream);
-  }, []);
+  const handleToggleStreaming = () => {
+    if (isStreaming) {
+      stopStreaming();
+    } else {
+      startStreaming();
+    }
+  };
 
   return (
-    <div className="p-4">
-      <Header status="Connected" buttonText="Back to Home" buttonLink="/" />
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <h2 className="mb-1 text-lg font-semibold">🟢 Local Stream</h2>
-          {localStream && <VideoPlayer stream={localStream} />}
-        </div>
-        <div className="flex-1">
-          <h2 className="mb-1 text-lg font-semibold">🔴 Remote Stream</h2>
-          {remoteStream && <VideoPlayer stream={remoteStream} />}
-        </div>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <h1>Live Stream</h1>
+
+      {/* Connection Status */}
+      <div style={{ marginBottom: "20px" }}>
+        <p>
+          Status:{" "}
+          {isConnected ? (
+            <span style={{ color: "green" }}>✓ Connected</span>
+          ) : (
+            <span style={{ color: "red" }}>✗ Disconnected</span>
+          )}
+        </p>
+        <p>Room ID: {roomId}</p>
       </div>
-      <p className="mt-4 text-sm text-gray-600">
-        Open this page in another browser window or incognito mode to see the
-        remote stream.
-      </p>
+
+      {/* Video Preview */}
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Your Stream Preview</h3>
+        <VideoStream stream={localStream} muted={true} />
+      </div>
+
+      {/* Controls */}
+      <div style={{ textAlign: "center" }}>
+        <button
+          onClick={handleToggleStreaming}
+          disabled={!isConnected}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: isStreaming ? "#dc3545" : "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: isConnected ? "pointer" : "not-allowed",
+            opacity: isConnected ? 1 : 0.5,
+          }}
+        >
+          {isStreaming ? "Stop Streaming" : "Start Streaming"}
+        </button>
+      </div>
+
+      {/* Instructions */}
+      <div
+        style={{
+          marginTop: "30px",
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "5px",
+        }}
+      >
+        <h4>Instructions:</h4>
+        <ol>
+          <li>Click "Start Streaming" to begin broadcasting</li>
+          <li>Allow camera and microphone permissions</li>
+          <li>Other users can join this room to see your stream</li>
+          <li>Viewers can watch at /watch page</li>
+        </ol>
+      </div>
     </div>
   );
-}
+};
+
+export default StreamPage;
